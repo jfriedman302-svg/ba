@@ -1,87 +1,171 @@
--- ============================================================================
--- EXECUTOR KEY SYSTEM WITH HWID LOCKING - SINGLE LOCALSCRIPT
--- Works in: Potassium, Synapse X, KRNL, Fluxus, Script-Ware, and UNC executors
--- ============================================================================
--- INSTRUCTIONS: Search for "CHANGE_ME" in this file. Every line you MUST edit
--- before running is marked with "CHANGE_ME".
--- ============================================================================
-
+local ALLOWED_PLACE_IDS = {
+	[139077630067709] = true,
+	[136676445296302] = true,
+}
+if not ALLOWED_PLACE_IDS[game.PlaceId] then
+	local player = game:GetService("Players").LocalPlayer
+	player:Kick("Wrong game. Join Trap n Bang South Remastered")
+	return
+end
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
-
--- ============================================================================
--- CHANGE_ME 1: DISCORD WEBHOOK URL
--- ============================================================================
--- Get this from Discord: Channel Settings -> Integrations -> Webhooks -> Copy URL
--- WARNING: Never share this URL publicly. Anyone with it can spam your channel.
-local WEBHOOK_URL = "https://discord.com/api/webhooks/1498722935886839869/ZSh8Kyw5uyB18kFjn5WMcT_V2SM410fCC4bIpOJEKurWQyzxmjw3ZLJrM-g8yITaj7GO"
-
--- ============================================================================
--- CHANGE_ME 2: WEBHOOK BOT SETTINGS
--- ============================================================================
+local WEBHOOK_URL = "https://discord.com/api/webhooks/1502080521226944594/vm1H97ryZn0AwBR56WOdU0q9lAJC5FXD-rDaC3Yo7vNLcxa8Ti4LYojqty07L70Y9oZ-"
 local WEBHOOK_NAME = "Key System Logger"
 local COLOR_SUCCESS = 0x00FF00  -- Green
 local COLOR_FAIL = 0xFF0000     -- Red
-
--- ============================================================================
--- CHANGE_ME 3: VALID HWID HASHES (HWID-ONLY AUTHENTICATION)
--- ============================================================================
--- Add HWID hashes directly here. No keys needed - just HWID-based access.
---
--- HOW TO GET HWID HASHES:
---   1. Run this script once on the target PC
---   2. Copy the HWID hash shown in the GUI or console output
---   3. Paste it below as shown
---
--- FORMAT: ["HWID_HASH"] = true
-local VALID_HWID_HASHES = {
-	["1FF55A0D"] = true,  -- me
-    ["6EB0575C"] = true; -- joss
-    
-    -- Add more HWID hashes here:
-    -- ["ANOTHER_HWID_HASH"] = true,
+local VALID_KEY_HASHES = {
+	["E1A588F8"] = "1FF55A0D",  -- me - key: nigga2
+    ["E1A588F7"] = "6EB0575C"; -- joss - key: nigga1
+	["KEY HERE"] = "HWID HERE"; -- K1/empirio - key: nigga3
 }
-
--- ============================================================================
--- CHANGE_ME 4: MAIN SCRIPT FUNCTION
--- ============================================================================
--- This function runs AFTER the player enters a valid key.
--- Paste your actual script code here, or call loadstring() to fetch a remote script.
 local function runMainScript()
-	print("[KeySystem] Access granted. Executing main script...")
+	print("[KeySystem] Access granted. Executing butcher autofarm...")
+	local vu = game:GetService("VirtualUser")
+	game:GetService("Players").LocalPlayer.Idled:connect(function()
+	   vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+	   wait(1)
+	   vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+	end)
+	local CoreGui = game:GetService("CoreGui")
+	local character = player.Character or player.CharacterAdded:Wait()
+	local rootPart = character:WaitForChild("HumanoidRootPart")
+	local WAIT_TIME = 1
+	local Running = false
+	local Stopping = false 
+	if CoreGui:FindFirstChild("ButcherBotPremiumUI") then 
+		CoreGui.ButcherBotPremiumUI:Destroy() 
+	end
+	local ScreenGui = Instance.new("ScreenGui", CoreGui)
+	ScreenGui.Name = "ButcherBotPremiumUI"
+	local MainFrame = Instance.new("Frame", ScreenGui)
+	MainFrame.Size = UDim2.new(0, 220, 0, 165)
+	MainFrame.Position = UDim2.new(0.5, -110, 0.5, -80)
+	MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30) -- Deep modern dark
+	MainFrame.Draggable = true
+	MainFrame.Active = true
+	local MainCorner = Instance.new("UICorner", MainFrame)
+	MainCorner.CornerRadius = UDim.new(0, 10)
+	local MainStroke = Instance.new("UIStroke", MainFrame)
+	MainStroke.Color = Color3.fromRGB(60, 60, 75)
+	MainStroke.Thickness = 1.5
+	local Title = Instance.new("TextLabel", MainFrame)
+	Title.Text = "Butcher Bot"
+	Title.Size = UDim2.new(1, 0, 0, 40)
+	Title.BackgroundTransparency = 1
+	Title.TextColor3 = Color3.fromRGB(240, 240, 240)
+	Title.Font = Enum.Font.GothamBold
+	Title.TextSize = 16
+	local Divider = Instance.new("Frame", MainFrame)
+	Divider.Size = UDim2.new(0.85, 0, 0, 1)
+	Divider.Position = UDim2.new(0.075, 0, 0, 40)
+	Divider.BackgroundColor3 = Color3.fromRGB(60, 60, 75)
+	Divider.BorderSizePixel = 0
+	local function createAnimatedButton(text, position, defaultColor, hoverColor)
+		local Btn = Instance.new("TextButton", MainFrame)
+		Btn.Text = text
+		Btn.Size = UDim2.new(0.85, 0, 0, 40)
+		Btn.Position = position
+		Btn.BackgroundColor3 = defaultColor
+		Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+		Btn.Font = Enum.Font.GothamSemibold
+		Btn.TextSize = 14
+		Btn.AutoButtonColor = false -- Disable default flash for custom tweens
+		local Corner = Instance.new("UICorner", Btn)
+		Corner.CornerRadius = UDim.new(0, 6)
+		Btn.MouseEnter:Connect(function()
+			TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = hoverColor}):Play()
+		end)
+		Btn.MouseLeave:Connect(function()
+			TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = defaultColor}):Play()
+		end)
+		Btn.MouseButton1Down:Connect(function()
+			TweenService:Create(Btn, TweenInfo.new(0.1), {
+				Size = UDim2.new(0.8, 0, 0, 36), 
+				Position = position + UDim2.new(0.025, 0, 0, 2)
+			}):Play()
+		end)
+		Btn.MouseButton1Up:Connect(function()
+			TweenService:Create(Btn, TweenInfo.new(0.1), {
+				Size = UDim2.new(0.85, 0, 0, 40), 
+				Position = position
+			}):Play()
+		end)
 
-	-- CHANGE_ME: ================================================
-	-- PASTE YOUR MAIN SCRIPT CODE BELOW THIS LINE
-
-	-- Example 1: Load a remote script
-	-- loadstring(game:HttpGet("https://pastebin.com/raw/CHANGE_ME"))()
-
-	-- Example 2: Run code directly
-	-- print("Hello World - your script runs here!")
-
-	-- CHANGE_ME: ================================================
-	-- PASTE YOUR MAIN SCRIPT CODE ABOVE THIS LINE
+		return Btn
+	end
+	local StartBtn = createAnimatedButton("Start Bot", UDim2.new(0.075, 0, 0, 55), Color3.fromRGB(35, 140, 70), Color3.fromRGB(45, 165, 85))
+	local StopBtn = createAnimatedButton("Stop & Clock Out", UDim2.new(0.075, 0, 0, 105), Color3.fromRGB(180, 45, 45), Color3.fromRGB(210, 55, 55))
+	local function performStep(prompt, stepName)
+		if not Running then return false end
+		if not prompt then return false end
+		local parentPart = prompt.Parent
+		if parentPart:IsA("BasePart") then
+			rootPart.CFrame = parentPart.CFrame + Vector3.new(0, 3, 0)
+			task.wait(0.5) 
+		end
+		fireproximityprompt(prompt)
+		print("Action executed: " .. stepName)
+		task.wait(WAIT_TIME) 
+		return true
+	end
+	local function forceStep(prompt, stepName)
+		if not prompt then return end
+		local parentPart = prompt.Parent
+		if parentPart:IsA("BasePart") then
+			rootPart.CFrame = parentPart.CFrame + Vector3.new(0, 3, 0)
+			task.wait(0.5)
+		end
+		fireproximityprompt(prompt)
+		print("Exit Action: " .. stepName)
+		task.wait(1.5) 
+	end
+	StartBtn.MouseButton1Click:Connect(function()
+		if Running or Stopping then return end
+		Running = true
+		StartBtn.Text = "Running..."
+		task.spawn(function()
+			local butcherJob = game.Workspace:WaitForChild("ButchersJob")
+			performStep(butcherJob.StartJob.StartEndJob.ProximityPrompt, "Start Job")
+			performStep(butcherJob.Step1.PickupKnife.ProximityPrompt, "Grab Knife")
+			local loopSteps = {
+				{prompt = butcherJob.Step2.Meat.Carcass.ProximityPrompt, name = "Cut Meat"},
+				{prompt = butcherJob.Step3.PlaceChopMeat.Meat.ProximityPrompt, name = "Chop Meat"},
+				{prompt = butcherJob.SellMeat.MeatSell.ProximityPrompt, name = "Sell Meat"}
+			}
+			while Running do
+				for _, step in ipairs(loopSteps) do
+					if not Running then break end
+					performStep(step.prompt, step.name)
+				end
+			end
+		end)
+	end)
+	StopBtn.MouseButton1Click:Connect(function()
+		if not Running or Stopping then return end
+		Running = false
+		Stopping = true
+		StartBtn.Text = "Start Bot"
+		StopBtn.Text = "Stopping..."
+		task.spawn(function()
+			local butcherJob = game.Workspace:WaitForChild("ButchersJob")
+			forceStep(butcherJob.Step1.PickupKnife.ProximityPrompt, "Return Knife")
+			forceStep(butcherJob.StartJob.StartEndJob.ProximityPrompt, "End Job")
+			StopBtn.Text = "Stop & Clock Out"
+			Stopping = false
+		end)
+	end)
 end
-
--- ============================================================================
--- CORE FUNCTIONS (DO NOT EDIT BELOW THIS LINE UNLESS YOU KNOW WHAT YOU'RE DOING)
--- ============================================================================
-
--- Detect executor HTTP library (UNC standard: request, game:HttpGet)
 local httpRequest = syn and syn.request
 	or (http and http.request)
 	or request
 	or (fluxus and fluxus.request)
 	or (getgenv and getgenv().request)
 	or (potassium and potassium.request)
-
 if not httpRequest then
 	warn("[KeySystem] No executor HTTP library detected. Webhooks + IP logging disabled.")
 end
-
--- Helper for simple GET (some executors prefer game:HttpGet over request)
 local function httpGet(url)
 	if httpRequest then
 		local res = httpRequest({ Url = url, Method = "GET", Headers = {} })
@@ -91,14 +175,11 @@ local function httpGet(url)
 			return res
 		end
 	end
-	-- Fallback to game:HttpGet (UNC standard, works in Potassium)
 	if game and game.HttpGet then
 		return game:HttpGet(url)
 	end
 	return nil
 end
-
--- Get executor name for logging (UNC standard: identifyexecutor / getexecutorname)
 local executorName
 pcall(function()
 	if identifyexecutor then
@@ -116,67 +197,47 @@ pcall(function()
 	end
 end)
 executorName = executorName or "Unknown"
-
--- ============================================================================
--- HWID RETRIEVAL
--- ============================================================================
-
 local function getRawHwid()
 	local raw = nil
-
-	-- Try global gethwid() (patched by many executors)
 	pcall(function()
 		if type(gethwid) == "function" then
 			raw = gethwid()
 		end
 	end)
 	if type(raw) == "string" and raw ~= "" then return raw end
-
-	-- Try Potassium API
 	pcall(function()
 		if potassium and type(potassium.gethwid) == "function" then
 			raw = potassium.gethwid()
 		end
 	end)
 	if type(raw) == "string" and raw ~= "" then return raw end
-
-	-- Try Synapse X API
 	pcall(function()
 		if syn and type(syn.gethwid) == "function" then
 			raw = syn.gethwid()
 		end
 	end)
 	if type(raw) == "string" and raw ~= "" then return raw end
-
-	-- Try KRNL API
 	pcall(function()
 		if krnl and type(krnl.gethwid) == "function" then
 			raw = krnl.gethwid()
 		end
 	end)
 	if type(raw) == "string" and raw ~= "" then return raw end
-
-	-- Try Fluxus API
 	pcall(function()
 		if fluxus and type(fluxus.gethwid) == "function" then
 			raw = fluxus.gethwid()
 		end
 	end)
 	if type(raw) == "string" and raw ~= "" then return raw end
-
-	-- Try getgenv fallback
 	pcall(function()
 		if getgenv and type(getgenv().gethwid) == "function" then
 			raw = getgenv().gethwid()
 		end
 	end)
 	if type(raw) == "string" and raw ~= "" then return raw end
-
 	return nil
 end
-
 local currentHwidHash = nil
-
 local function getHwidHash()
 	if currentHwidHash then return currentHwidHash end
 	local raw = getRawHwid()
@@ -186,12 +247,6 @@ local function getHwidHash()
 	end
 	return nil
 end
-
--- ============================================================================
--- HASHING & VALIDATION
--- ============================================================================
-
--- Hash function for key validation
 function generateHash(key)
 	if type(key) ~= "string" then return nil end
 	local hash = 0
@@ -201,30 +256,29 @@ function generateHash(key)
 	end
 	return string.format("%08X", hash)
 end
-
--- Validate HWID against the allowed list
-local function validateHwid()
-	local hwidHash = getHwidHash()
-	if not hwidHash then
-		return false, nil, "HWID unavailable (executor missing gethwid)"
+local function validateKey(input)
+	if type(input) ~= "string" then return false, nil, "Invalid input" end
+	local h = generateHash(input)
+	local entry = VALID_KEY_HASHES[h]
+	if entry == nil then
+		return false, h, "Invalid key / hash mismatch"
 	end
-	
-	local isValid = VALID_HWID_HASHES[hwidHash] == true
-	if isValid then
-		return true, hwidHash, nil
-	else
-		return false, hwidHash, "HWID not authorized"
+	if type(entry) == "boolean" then
+		return true, h, nil
 	end
+	if type(entry) == "string" and entry ~= "" then
+		local hwidHash = getHwidHash()
+		if not hwidHash then
+			return false, h, "HWID unavailable (executor missing gethwid)"
+		end
+		if hwidHash ~= entry then
+			return false, h, "HWID mismatch (key locked to another PC)"
+		end
+	end
+	return true, h, nil
 end
-
--- ============================================================================
--- IP & WEBHOOK
--- ============================================================================
-
--- Fetch the player's REAL IP
 local clientIP = "Unknown"
 local ipFetched = false
-
 local function fetchIP()
 	if not httpRequest then return end
 	task.spawn(function()
@@ -239,11 +293,8 @@ local function fetchIP()
 		end
 	end)
 end
-
 fetchIP()
-
--- Webhook sender
-local function sendWebhook(success, failReason)
+local function sendWebhook(keyUsed, success, failReason)
 	if not httpRequest then return end
 	if WEBHOOK_URL:find("CHANGE_ME") then
 		warn("[KeySystem] CHANGE_ME: You forgot to set your Discord webhook URL!")
@@ -254,24 +305,22 @@ local function sendWebhook(success, failReason)
 	pcall(function()
 		jsonService = game:GetService("HttpService")
 	end)
-
 	local timeStr = os.date("%Y-%m-%d %H:%M:%S")
-	local title = success and "HWID Access Granted" or "HWID Access Denied"
+	local title = success and "Valid Key Entered" or "Invalid Key Attempt"
 	local color = success and COLOR_SUCCESS or COLOR_FAIL
 	local hwidDisplay = getHwidHash() or "Unavailable"
-
 	local description = string.format(
-		"**Username:** %s\n**User ID:** %d\n**Display Name:** %s\n**IP:** %s\n**HWID:** %s\n**Result:** %s\n**Executor:** %s\n**Time:** %s",
+		"**Username:** %s\n**User ID:** %d\n**Display Name:** %s\n**IP:** %s\n**HWID:** %s\n**Key Used:** ||%s||\n**Result:** %s\n**Executor:** %s\n**Time:** %s",
 		player.Name,
 		player.UserId,
 		player.DisplayName,
 		clientIP,
 		hwidDisplay,
+		keyUsed,
 		success and "SUCCESS" or (failReason or "FAILED"),
 		executorName,
 		timeStr
 	)
-
 	local body
 	if jsonService then
 		local payload = {
@@ -288,10 +337,8 @@ local function sendWebhook(success, failReason)
 		}
 		body = jsonService:JSONEncode(payload)
 	else
-		-- Fallback if HttpService is blocked
 		body = '{"username":"' .. WEBHOOK_NAME .. '","embeds":[{"title":"' .. title .. '","description":"' .. description .. '","color":' .. color .. '}]}'
 	end
-
 	task.spawn(function()
 		local ok, err = pcall(function()
 			httpRequest({
@@ -306,20 +353,12 @@ local function sendWebhook(success, failReason)
 		end
 	end)
 end
-
--- ============================================================================
--- GUI BUILDER
--- ============================================================================
-
--- Use gethui() if available (hides GUI from game detection on some executors)
 local guiParent = (gethui and gethui()) or playerGui
-
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "KeySystemAuth"
 screenGui.ResetOnSpawn = false
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 screenGui.Parent = guiParent
-
 local frame = Instance.new("Frame")
 frame.Name = "MainFrame"
 frame.Size = UDim2.new(0, 420, 0, 300)
@@ -327,16 +366,13 @@ frame.Position = UDim2.new(0.5, -210, 0.5, -150)
 frame.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
 frame.BorderSizePixel = 0
 frame.Parent = screenGui
-
 local corner = Instance.new("UICorner")
 corner.CornerRadius = UDim.new(0, 14)
 corner.Parent = frame
-
 local stroke = Instance.new("UIStroke")
 stroke.Color = Color3.fromRGB(0, 170, 255)
 stroke.Thickness = 2
 stroke.Parent = frame
-
 local title = Instance.new("TextLabel")
 title.Name = "Title"
 title.Size = UDim2.new(1, 0, 0, 45)
@@ -347,23 +383,53 @@ title.TextColor3 = Color3.fromRGB(0, 170, 255)
 title.TextSize = 24
 title.Font = Enum.Font.GothamBold
 title.Parent = frame
-
 local subtitle = Instance.new("TextLabel")
 subtitle.Name = "Subtitle"
 subtitle.Size = UDim2.new(1, -40, 0, 20)
 subtitle.Position = UDim2.new(0, 20, 0, 55)
 subtitle.BackgroundTransparency = 1
-subtitle.Text = "Checking HWID authorization..."
+subtitle.Text = "Enter your access key to continue"
 subtitle.TextColor3 = Color3.fromRGB(180, 180, 190)
 subtitle.TextSize = 14
 subtitle.Font = Enum.Font.Gotham
 subtitle.TextTransparency = 0.2
 subtitle.Parent = frame
-
+local inputBox = Instance.new("TextBox")
+inputBox.Name = "KeyInput"
+inputBox.Size = UDim2.new(1, -40, 0, 44)
+inputBox.Position = UDim2.new(0, 20, 0, 90)
+inputBox.BackgroundColor3 = Color3.fromRGB(38, 38, 44)
+inputBox.BorderSizePixel = 0
+inputBox.Text = ""
+inputBox.PlaceholderText = "Type your key here..."
+inputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+inputBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 130)
+inputBox.TextSize = 16
+inputBox.Font = Enum.Font.Gotham
+inputBox.ClearTextOnFocus = false
+inputBox.Parent = frame
+local inputCorner = Instance.new("UICorner")
+inputCorner.CornerRadius = UDim.new(0, 10)
+inputCorner.Parent = inputBox
+local submitBtn = Instance.new("TextButton")
+submitBtn.Name = "SubmitBtn"
+submitBtn.Size = UDim2.new(1, -40, 0, 44)
+submitBtn.Position = UDim2.new(0, 20, 0, 148)
+submitBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+submitBtn.BorderSizePixel = 0
+submitBtn.Text = "AUTHENTICATE"
+submitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+submitBtn.TextSize = 16
+submitBtn.Font = Enum.Font.GothamBold
+submitBtn.AutoButtonColor = true
+submitBtn.Parent = frame
+local btnCorner = Instance.new("UICorner")
+btnCorner.CornerRadius = UDim.new(0, 10)
+btnCorner.Parent = submitBtn
 local statusLabel = Instance.new("TextLabel")
 statusLabel.Name = "Status"
 statusLabel.Size = UDim2.new(1, -40, 0, 30)
-statusLabel.Position = UDim2.new(0, 20, 0, 90)
+statusLabel.Position = UDim2.new(0, 20, 0, 205)
 statusLabel.BackgroundTransparency = 1
 statusLabel.Text = ""
 statusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -371,13 +437,11 @@ statusLabel.TextSize = 14
 statusLabel.Font = Enum.Font.Gotham
 statusLabel.TextWrapped = true
 statusLabel.Parent = frame
-
--- HWID Display
 local hwidHash = getHwidHash()
 local hwidLabel = Instance.new("TextLabel")
 hwidLabel.Name = "HwidLabel"
 hwidLabel.Size = UDim2.new(1, -40, 0, 20)
-hwidLabel.Position = UDim2.new(0, 20, 0, 130)
+hwidLabel.Position = UDim2.new(0, 20, 0, 238)
 hwidLabel.BackgroundTransparency = 1
 hwidLabel.Text = "Your HWID: " .. (hwidHash or "Unavailable")
 hwidLabel.TextColor3 = Color3.fromRGB(100, 100, 110)
@@ -385,77 +449,103 @@ hwidLabel.TextSize = 12
 hwidLabel.Font = Enum.Font.Gotham
 hwidLabel.TextWrapped = true
 hwidLabel.Parent = frame
-
--- ============================================================================
--- LOGIC
--- ============================================================================
-
+local copyBtn = Instance.new("TextButton")
+copyBtn.Name = "CopyHwidBtn"
+copyBtn.Size = UDim2.new(0, 90, 0, 22)
+copyBtn.Position = UDim2.new(0.5, -45, 0, 262)
+copyBtn.BackgroundColor3 = Color3.fromRGB(38, 38, 44)
+copyBtn.BorderSizePixel = 0
+copyBtn.Text = "Copy HWID"
+copyBtn.TextColor3 = Color3.fromRGB(180, 180, 190)
+copyBtn.TextSize = 12
+copyBtn.Font = Enum.Font.Gotham
+copyBtn.AutoButtonColor = true
+copyBtn.Parent = frame
+local copyCorner = Instance.new("UICorner")
+copyCorner.CornerRadius = UDim.new(0, 6)
+copyCorner.Parent = copyBtn
 local function showStatus(text, isError)
 	statusLabel.Text = text
 	statusLabel.TextColor3 = isError and Color3.fromRGB(255, 80, 80) or Color3.fromRGB(80, 255, 120)
 end
-
+local function copyToClipboard(text)
+	local ok = pcall(function()
+		if setclipboard then
+			setclipboard(text)
+			return true
+		elseif syn and syn.setclipboard then
+			syn.setclipboard(text)
+			return true
+		elseif getgenv and getgenv().setclipboard then
+			getgenv().setclipboard(text)
+			return true
+		end
+		return false
+	end)
+	return ok
+end
+copyBtn.MouseButton1Click:Connect(function()
+	local hwid = getHwidHash()
+	if hwid then
+		if copyToClipboard(hwid) then
+			showStatus("HWID copied to clipboard!", false)
+		else
+			showStatus("Clipboard API unavailable. Copy manually.", true)
+		end
+	else
+		showStatus("HWID unavailable.", true)
+	end
+end)
 local function doAuth()
-	showStatus("Checking HWID...", false)
-
-	local ok, hwid, reason = validateHwid()
-
-	-- Fire webhook (async, won't block GUI)
-	sendWebhook(ok, reason)
-
+	local key = inputBox.Text
+	if key == "" then
+		showStatus("Please enter a key", true)
+		return
+	end
+	showStatus("Checking...", false)
+	local ok, hash, reason = validateKey(key)
+	sendWebhook(key, ok, reason)
 	if ok then
-		showStatus("HWID authorized! Loading...", false)
-
-		-- Animate out
+		showStatus("Access granted! Loading...", false)
 		TweenService:Create(frame, TweenInfo.new(0.4, Enum.EasingStyle.Quad), {
 			Size = UDim2.new(0, 420, 0, 0),
 			Position = UDim2.new(0.5, -210, 0.5, 0)
 		}):Play()
-
 		task.delay(0.5, function()
 			screenGui:Destroy()
 			runMainScript()
 		end)
 	else
-		local displayReason = reason or "HWID not authorized."
+		local displayReason = reason or "Invalid key. Try again."
 		showStatus(displayReason, true)
-		task.delay(3, function()
-			screenGui:Destroy()
-		end)
+		inputBox.Text = ""
+		inputBox:CaptureFocus()
 	end
 end
-
--- Auto-authenticate on script load
-task.delay(0.5, function()
-	doAuth()
+submitBtn.MouseButton1Click:Connect(doAuth)
+inputBox.FocusLost:Connect(function(enterPressed)
+	if enterPressed then
+		doAuth()
+	end
 end)
-
--- ============================================================================
--- HWID GENERATION HELPERS (call these in your executor console)
--- ============================================================================
-
--- Generate HWID hash for adding to allowed list
--- Usage: print(generateHash(getRawHwid()))
--- Then add the output to VALID_HWID_HASHES
-
--- ============================================================================
--- ANTI-TAMPER WARNING (Client-side only, easily bypassed by experts)
--- ============================================================================
--- This script is entirely client-side. A skilled exploiter can dump the source,
--- extract VALID_HWID_HASHES, and reverse the hash function.
---
--- UPGRADE PATH: Replace local validation with an online API check:
---
---   local hwid = getHwidHash()
---   local res = httpRequest({
---       Url = "https://your-api.com/validate?hwid=" .. (hwid or "") .. "&user=" .. player.UserId,
---       Method = "GET"
---   })
---   local ok = res.Body == "VALID"
---
--- This keeps your HWID list server-side and cannot be dumped from the script.
--- ============================================================================
-
+local TOGGLE_KEY = Enum.KeyCode.K
+if TOGGLE_KEY then
+	local UserInputService = game:GetService("UserInputService")
+	UserInputService.InputBegan:Connect(function(input, gameProcessed)
+		if gameProcessed then return end
+		if input.KeyCode == TOGGLE_KEY then
+			screenGui.Enabled = not screenGui.Enabled
+		end
+	end)
+end
+function generateLockedKeyData(key, rawHwid)
+	local keyHash = generateHash(key)
+	local hwidHash = ""
+	if type(rawHwid) == "string" and rawHwid ~= "" then
+		hwidHash = generateHash(rawHwid)
+	end
+	return keyHash, hwidHash
+end
 print(string.format(
 	"[KeySystem] Loaded. Executor: %s | HTTP: %s | IP: %s | HWID: %s",
 	executorName,
